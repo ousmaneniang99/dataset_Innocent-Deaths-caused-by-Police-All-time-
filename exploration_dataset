@@ -1,0 +1,9 @@
+#Exploration de notre dataset avce head() , info(), describe()
+data.head()
+data.info()
+data.describe()
+
+#nous pouvons aussi utiliser le rapport généré par ydata_profiling pour explorer les données de notre dataset
+
+profile=ProfileReport(data)
+profile.to_file('rapport.html')
