@@ -1,0 +1,19 @@
+#installation des librairies nécessaires
+!pip install pandas
+!pip install ydata_profiling
+!pip install plotly
+!pip install seaborn
+!pip install matplotlib
+
+
+#importation des libraires
+import pandas as pd
+from ydata_profiling import ProfileReport
+import plotly as px
+import plotly.express as pt
+import plotly.graph_objects as go
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#chargement de notre fichier contenant nos données
+data=pd.read_csv('/content/Innocent Deaths caused by Police (All time).csv')
