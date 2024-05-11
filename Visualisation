@@ -1,0 +1,134 @@
+# Comptage des nombres d'occurrences pour chaque sexe
+data_count = data['Gender'].value_counts().reset_index()
+
+# Renommage des colonnes pour le diagramme circulaire
+data_count.columns = ['Sexe', 'Nombre']
+
+# Création de la figure
+fig = go.Figure()
+
+# Ajout du traceur de diagramme circulaire
+fig.add_trace(go.Pie(labels=data_count['Sexe'],
+                     values=data_count['Nombre'],
+                     hole=0.4,
+                     pull=[0.1 if sexe == 'Male' else 0 for sexe in data_count['Sexe']], # Expression conditionnelle pour le tirage
+                     hoverinfo='label+percent'))
+
+# Personnalisation de la mise en page
+fig.update_layout(title='Répartition des morts selon le sexe',
+                  annotations=[dict(text='pourcentage de morts ', x=0.5, y=0.5, font_size=20, showarrow=False)],
+                  )
+
+# Personnalisation des couleurs
+colors = ['royalblue', 'darkorange']
+fig.update_traces(marker=dict(colors=colors))
+
+# Affichage du diagramme circulaire
+fig.show()
+
+
+
+#visualisation graphique selon la race
+
+# Comptage des nombres d'occurrences pour chaque race
+data_race = data['Race'].value_counts().reset_index()
+
+# Renommage des colonnes pour le diagramme
+data_race.columns = ['Race', 'Nombre']
+
+# Création du graphique
+plt.figure(figsize=(10, 6))
+
+# Tracer le graphique
+ax = sns.barplot(data=data_race, x='Race', y='Nombre', palette='viridis')
+
+# Ajout d'annotations pour afficher les valeurs sur les barres
+for p in ax.patches:
+    ax.annotate(f"{p.get_height()}",
+                (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='center',
+                fontsize=10, color='green',
+                xytext=(0, 5),
+                textcoords='offset points')
+
+# Ajout de titres et de libellés
+plt.title('Nombre de morts selon la race', fontsize=16)
+plt.xlabel('Race', fontsize=14)
+plt.ylabel('Nombre de morts', fontsize=14)
+
+# Rotation des étiquettes de l'axe des x pour une meilleure lisibilité
+plt.xticks(rotation=45)
+
+# Suppression des bordures du graphique
+sns.despine()
+
+# Affichage du graphique
+plt.show()
+
+
+# Créer un DataFrame avec le nombre de morts par État
+data_map = data['State'].value_counts().reset_index()
+data_map.columns = ['State', 'Nombre de morts']
+
+# Fusionner avec les données géographiques (latitude et longitude) par État
+data_map = data_map.merge(data.groupby('State')[['Latitude', 'Longitude']].mean().reset_index(), on='State')
+
+# Créer un diagramme de dispersion avec Plotly Express
+fig = pt.scatter_mapbox(data_map,
+                        lat="Latitude",
+                        lon="Longitude",
+                        hover_name="State",
+                        hover_data=["Nombre de morts"],
+                        color="Nombre de morts",
+                        size="Nombre de morts",
+                        color_continuous_scale=px.colors.sequential.Viridis,
+                        size_max=15,
+                        zoom=3,
+                        height=600
+                       )
+
+# Personnalisation de la carte
+fig.update_layout(mapbox_style="carto-positron")  # Utiliser un style de carte différent
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+# Titre et légendes
+fig.update_layout(title='Nombre de morts par État')
+fig.update_layout(coloraxis_colorbar=dict(title='Nombre de morts'))
+
+# Afficher la carte
+fig.show()
+
+
+# Créer un graphique à barres avec Seaborn
+
+# Définir les intervalles d'âge
+bins = [0, 5, 12, 18, 35, 65, float('inf')]  # Les bornes des intervalles d'âge
+
+# Définir les étiquettes pour chaque intervalle d'âge
+labels = ['Enfant', 'Enfant/Adolescent', 'Adolescent', 'Jeune Adulte', 'Adulte', 'Senior']
+
+# Créer une fonction pour regrouper les âges par intervalle
+def group_age(age):
+    return pd.cut(age, bins=bins, labels=labels)
+
+# Appliquer la fonction à la colonne 'Age'
+data['Age Intervalle'] = group_age(data['Age'])
+
+# Compter le nombre d'occurrences dans chaque intervalle
+data_age = data['Age Intervalle'].value_counts().reset_index()
+data_age.columns = ["Age_Intervalle", 'Nombres']
+
+
+# Créer un graphique à barres avec Seaborn
+plt.figure(figsize=(10, 6))
+sns.barplot(data=data_age, x='Age_Intervalle', y='Nombres', palette='viridis')
+
+# Ajouter des titres et des libellés
+plt.title('Répartition des âges par intervalle')
+plt.xlabel('Intervalle d\'âge')
+plt.ylabel('Nombre de personnes')
+
+# Afficher le graphique
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
