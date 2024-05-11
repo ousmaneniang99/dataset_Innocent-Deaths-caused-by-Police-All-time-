@@ -1,0 +1,48 @@
+# Création de la fonction pour le remplacement des données manquantes dans la colonne 'URL of image'
+def url(name):
+    return 'https://fatalencounters.org/wp-content/uploads/2021/09/{}.png'.format(name.replace(" ", "-"))
+
+#netoyage des données (data mining)
+
+# supression des colonnes avce des valeurs
+colonne=['Alleged weapon','Aggressive physical movement', 'Fleeing/Not fleeing', 'Description Temp','URL Temp']
+data.drop(columns=colonne, inplace=True)
+
+#remplacement des valeurs manquantes de la colonne 'Age' par la valeur modale
+data['Age'].fillna(data['Age'].mode()[0], inplace=True)
+#remplacement des valeurs mmanquantes de la colonne 'Gender' par la valeur modale aussi
+data['Gender'].fillna(data['Gender'].mode()[0], inplace=True)
+#suppression des colonnes 'Location of injury (address)' , 'Location of death (city)'Location of death (zip code) et 'Location of death (contry)'
+colonne_adresse=['Location of injury (address)','Location of death (city)','Location of death (zip code)','Location of death (county)']
+data.drop(columns=colonne_adresse, inplace=True)
+#remplacement des valeurs manquantes de la colonne 'Dispositions/Exclusions INTERNAL USE, NOT FOR ANALYSIS' par la valeur 'Unknown' comme étant inconnues
+data['Dispositions/Exclusions INTERNAL USE, NOT FOR ANALYSIS'].fillna('Unknown', inplace=True)
+
+
+# Appliquer la fonction à chaque élément de la colonne 'Name' pour remplir les valeurs manquantes dans la colonne 'URL of image'
+data['URL of image'].fillna(data['Name'].apply(url), inplace=True)
+
+#netoyage de la colonne 'Latitude' que l'on va convertir en float
+# Supprimer les virgules à la fin de chaque valeur dans la colonne 'Latitude'
+data['Latitude'] = data['Latitude'].str.replace(',', '')
+# Convertir la colonne 'Latitude' en flottant
+data['Latitude'] = data['Latitude'].astype(float)
+
+#remplacement des valeurs de la colonnes 'Agency or agencies involved' par 'Unknown'
+data['Agency or agencies involved'].fillna('Unknown' , inplace=True)
+
+#remplacer la valeur manquante de la colonne 'Supporting document link ' par 'no Supporting document link '
+data['Supporting document link'].fillna('no Supporting document link', inplace=True)
+
+#remplacement des valeurs manquantes de la colonne 'Foreknowledge of mental illness' par 'Unknown'
+data['Foreknowledge of mental illness'].fillna('Unknown' , inplace=True)
+
+#remplacement de la valeur manquante de la colonne 'Intended use of force (Developing)' par 'Undetermined'
+data['Intended use of force (Developing)'].fillna('Undetermined', inplace=True)
+
+#remplace la valeur manquante de la colonne 'brief description' grace au lien de la colonne 'Supporting document link' correspondante
+data['Brief description'].fillna('Police identify suspect killed in shootout with officers after deadly rampage in Germantown', inplace=True)
+
+#remplacement des 3 valeurs manquantes de la colonne 'Highest level of force' par 'Unknown'
+data['Highest level of force'].fillna('Unknown', inplace=True)
+
